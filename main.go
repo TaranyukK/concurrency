@@ -2,16 +2,23 @@ package main
 
 import (
 	"fmt"
-	concur "go/concurrency/1-concurrency"
+	randomapi "go/concurrency/2-random-api"
+	"log"
+	"net/http"
 )
 
 func main() {
-	generatedNum := make(chan int)
-	powedNum := make(chan int)
-	go concur.CreateSlice(generatedNum)
-	go concur.PowNumber(generatedNum, powedNum)
+	router := http.NewServeMux()
+	randomapi.NewRandomNumHandler(router)
 
-	for val := range powedNum {
-		fmt.Println(val)
+	server := http.Server{
+		Addr:    ":8080",
+		Handler: router,
+	}
+
+	fmt.Println("Server running on port :8080")
+	err := server.ListenAndServe()
+	if err != nil {
+		log.Fatal(err)
 	}
 }
