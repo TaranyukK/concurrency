@@ -2,21 +2,25 @@ package main
 
 import (
 	"fmt"
-	randomapi "go/concurrency/2-random-api"
+	"go/concurrency/configs"
+	"go/concurrency/internals/verify"
 	"log"
 	"net/http"
 )
 
 func main() {
+	conf := configs.LoadConfig()
 	router := http.NewServeMux()
-	randomapi.NewRandomNumHandler(router)
+	verify.NewVerifyHandler(router, verify.VerifyHandlerDeps{
+		Config: conf,
+	})
 
 	server := http.Server{
 		Addr:    ":8080",
 		Handler: router,
 	}
 
-	fmt.Println("Server running on port :8080")
+	fmt.Println("Server is listening on 8080")
 	err := server.ListenAndServe()
 	if err != nil {
 		log.Fatal(err)
